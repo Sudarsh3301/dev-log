@@ -4,10 +4,12 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Tag from "@/components/Tag.astro";
-import Datetime from "@/components/Datetime.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import { SITE } from "@/config";
+import IconBrandX from "@/assets/icons/IconBrandX.svg";
+import IconGitHub from "@/assets/icons/IconGitHub.svg";
+import IconMail from "@/assets/icons/IconMail.svg";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -24,7 +26,6 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
-  timezone,
   tags,
 } = post.data;
 
@@ -86,8 +87,32 @@ const nextPost =
     >
       {title}
     </h1>
-    <div class="post-meta">
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+    <div class="author-info">
+      <div class="social-links">
+        {SITE.twitter && (
+          <a href={SITE.twitter} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on X`}>
+            <IconBrandX class="social-icon-svg" />
+          </a>
+        )}
+        {SITE.github && (
+          <a href={SITE.github} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on GitHub`}>
+            <IconGitHub class="social-icon-svg" />
+          </a>
+        )}
+        {SITE.email && (
+          <a href={SITE.email} target="_blank" rel="noopener noreferrer" title={`Email ${SITE.author}`}>
+            <IconMail class="social-icon-svg" />
+          </a>
+        )}
+      </div>
+      <div class="author-details">
+        <a href={SITE.profile || SITE.website} target="_blank" rel="noopener noreferrer">
+          By {SITE.author}
+        </a>
+      </div>
+      <div class="post-date">
+        {pubDatetime.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+      </div>
     </div>
     <article id="article" class="app-prose post-article">
       <Content />

@@ -1,24 +1,48 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { SITE } from "@/config";
+import IconGitHub from "@/assets/icons/IconGitHub.svg";
+import IconBrandX from "@/assets/icons/IconBrandX.svg";
+import IconMail from "@/assets/icons/IconMail.svg";
+import IconGraduationCap from "@/assets/icons/IconGraduationCap.svg";
 
 const navItems = ["Blog", "Notes", "Lab", "Projects", "Papers", "Random"];
 ---
 
 <Layout title={SITE.title} description={SITE.desc}>
   <main id="main-content" data-layout="index" class="home-layout app-layout">
-    <h1>Hi, I'm Sudarsh.</h1>
-    <p>
-      I work on reasoning systems, inference optimization, and multimodal AI.
-    </p>
-    <p>
-      Currently exploring efficient reasoning architectures, latent-space
-      methods, and real-time AI systems.
-    </p>
-    <p>
-      I like building systems that expose how models think rather than just what
-      they output.
-    </p>
+    <div class="identity">
+      <img src="/profile.png" alt={`${SITE.author}'s photo`} class="profile-pic" />
+      <div class="identity-text">
+        <h1 class="identity-name">{SITE.author}</h1>
+        <div class="identity-icons">
+          {SITE.github && (
+            <a href={SITE.github} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on GitHub`}>
+              <IconGitHub class="meta-icon-svg" />
+            </a>
+          )}
+          {SITE.twitter && (
+            <a href={SITE.twitter} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on X`}>
+              <IconBrandX class="meta-icon-svg" />
+            </a>
+          )}
+          {SITE.email && (
+            <a href={SITE.email} target="_blank" rel="noopener noreferrer" title={`Email ${SITE.author}`}>
+              <IconMail class="meta-icon-svg" />
+            </a>
+          )}
+          {SITE.googleScholar && (
+            <a href={SITE.googleScholar} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on Google Scholar`}>
+              <IconGraduationCap class="meta-icon-svg" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <p>I work on reasoning systems, inference optimization, and multimodal AI.</p>
+    <p>Currently exploring efficient reasoning architectures, latent-space methods, and real-time AI systems.</p>
+    <p>My <a href="/random/blogs/motives" target="_blank">world model</a> is simple: build systems that expose how models think, not just what they output.</p>
 
     <nav class="home-nav" aria-label="Notebook sections">
       {navItems.map(item => <a href={`/${item.toLowerCase()}`}>{item}</a>)}
