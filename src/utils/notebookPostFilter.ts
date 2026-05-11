@@ -26,6 +26,9 @@ const NOTEBOOK_TAGS = new Set([
   "reproduction",
   "random",
   "books",
+  "cuda",
+  "gpu",
+  "kernels",
 ]);
 
 export const hasNotebookTag = (tags: string[]) =>
