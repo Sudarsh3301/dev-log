@@ -2,10 +2,11 @@ import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
 import { getPath } from "@/utils/getPath";
 import getSortedPosts from "@/utils/getSortedPosts";
+import notebookPostFilter from "@/utils/notebookPostFilter";
 import { SITE } from "@/config";
 
 export async function GET() {
-  const posts = await getCollection("blog");
+  const posts = await getCollection("blog", post => notebookPostFilter(post));
   const sortedPosts = getSortedPosts(posts);
   return rss({
     title: SITE.title,

@@ -1,6 +1,4 @@
 ---
-import IconHash from "@/assets/icons/IconHash.svg";
-
 type Props = {
   tag: string;
   tagName: string;
@@ -11,25 +9,8 @@ const { tag, tagName, size = "lg" } = Astro.props;
 ---
 
 <li>
-  <a
-    href={`/tags/${tag}/`}
+  <span
     transition:name={tag}
-    class:list={[
-      "flex items-center gap-0.5",
-      "border-b-2 border-dashed border-foreground",
-      "hover:-mt-0.5 hover:border-accent hover:text-accent",
-      "focus-visible:border-none focus-visible:text-accent",
-      { "text-sm": size === "sm" },
-      { "text-lg": size === "lg" },
-    ]}
+    class:list={["tag-token", { "text-sm": size === "sm" }]}>#{tagName}</span
   >
-    <IconHash
-      class:list={[
-        "opacity-80",
-        { "size-5": size === "lg" },
-        { "size-4": size === "sm" },
-      ]}
-    />
-    {tagName}
-  </a>
 </li>

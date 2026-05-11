@@ -3,18 +3,34 @@
 @layer base {
   /* ===== Override default Tailwind Typography styles ===== */
   .app-prose {
-    @apply prose;
+    @apply prose max-w-none;
+    color: var(--foreground);
 
     h1,
     h2,
     h3,
     h4,
     th {
-      @apply mb-3 text-foreground;
+      color: var(--heading);
+      font-weight: 500;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 23px;
+      margin-top: 3rem;
+      margin-bottom: 1.25rem;
     }
 
     h3 {
-      @apply italic;
+      font-size: 21px;
+      margin-top: 3rem;
+      margin-bottom: 2rem;
     }
 
     p,
@@ -24,23 +40,39 @@
     figcaption,
     table,
     code {
-      @apply text-foreground;
+      color: var(--foreground);
+    }
+
+    p,
+    li {
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    p {
+      margin-bottom: 1rem;
     }
 
     a {
-      @apply wrap-break-word text-foreground decoration-dashed underline-offset-4 hover:text-accent focus-visible:no-underline;
+      @apply wrap-break-word underline-offset-4 focus-visible:no-underline;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     ul {
       @apply overflow-x-clip;
     }
 
-    li {
-      @apply marker:text-accent;
+    li::marker {
+      color: var(--accent);
     }
 
     hr {
-      @apply border-border;
+      border-color: var(--border);
     }
 
     img {
@@ -54,7 +86,8 @@
     table {
       th,
       td {
-        @apply border border-border p-2;
+        border: 1px solid var(--border);
+        padding: 0.5rem;
       }
 
       th {
@@ -67,7 +100,12 @@
     }
 
     code {
-      @apply rounded bg-muted/75 p-1 wrap-break-word text-foreground before:content-none after:content-none;
+      @apply wrap-break-word before:content-none after:content-none;
+      border-radius: 3px;
+      background-color: var(--code-bg);
+      padding: 0.2em 0.4em;
+      font-family: var(--font-mono);
+      font-size: 0.92em;
     }
 
     .astro-code code {
@@ -75,7 +113,10 @@
     }
 
     blockquote {
-      @apply border-s-accent/80 wrap-break-word opacity-80;
+      @apply wrap-break-word;
+      border-inline-start-color: var(--accent);
+      color: var(--foreground);
+      opacity: 0.84;
     }
 
     details {
@@ -88,12 +129,24 @@
 
     pre {
       @apply focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background-color: var(--code-bg);
+      padding: 1rem;
     }
+  }
+
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    color: var(--heading);
   }
 
   /* ===== Code Blocks & Syntax Highlighting ===== */
   .astro-code {
-    @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span]:text-(--shiki-light);
+    @apply flex outline-border [&_span]:text-(--shiki-light);
+    border: 1px solid var(--border);
+    background-color: var(--code-bg) !important;
   }
 
   html[data-theme="dark"] .astro-code {

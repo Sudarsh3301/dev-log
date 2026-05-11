@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import SectionPostList from "@/components/SectionPostList.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { hasNotebookTag } from "@/utils/notebookPostFilter";
+import { SITE } from "@/config";
+
+const posts = await getCollection(
+  "blog",
+  ({ data }) =>
+    hasNotebookTag(data.tags) &&
+    data.tags.some(tag =>
+      ["paper", "papers", "reproduction"].includes(tag.toLowerCase())
+    )
+);
+---
+
+<Layout
+  title={`Papers | ${SITE.title}`}
+  description="Publications and paper notes."
+>
+  <Header />
+  <Main
+    pageTitle="Papers"
+    pageDesc="Publications, paper notes, reproductions, and reading traces."
+  >
+    <SectionPostList
+      posts={getSortedPosts(posts)}
+      emptyText="Paper notes and reproductions will collect here."
+    />
+  </Main>
+  <Footer />
+</Layout>

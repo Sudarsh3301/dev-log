@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import SectionPostList from "@/components/SectionPostList.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { hasNotebookTag } from "@/utils/notebookPostFilter";
+import { SITE } from "@/config";
+
+const posts = await getCollection(
+  "blog",
+  ({ data }) =>
+    hasNotebookTag(data.tags) &&
+    data.tags.some(tag => ["project", "projects"].includes(tag.toLowerCase()))
+);
+---
+
+<Layout
+  title={`Projects | ${SITE.title}`}
+  description="Research and project writeups."
+>
+  <Header />
+  <Main
+    pageTitle="Projects"
+    pageDesc="Research and project writeups, without portfolio-card framing."
+  >
+    <SectionPostList
+      posts={getSortedPosts(posts)}
+      emptyText="Project writeups will collect here."
+    />
+  </Main>
+  <Footer />
+</Layout>

@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Card from "@/components/Card.astro";
+
+type Props = {
+  posts: CollectionEntry<"blog">[];
+  emptyText: string;
+};
+
+const { posts, emptyText } = Astro.props;
+---
+
+{
+  posts.length > 0 ? (
+    <ul class="post-list">
+      {posts.map(post => (
+        <Card {...post} />
+      ))}
+    </ul>
+  ) : (
+    <p class="section-empty">{emptyText}</p>
+  )
+}

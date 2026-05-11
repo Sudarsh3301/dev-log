@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import SectionPostList from "@/components/SectionPostList.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import notebookPostFilter from "@/utils/notebookPostFilter";
+import { SITE } from "@/config";
+
+const posts = await getCollection("blog", post => notebookPostFilter(post));
+---
+
+<Layout
+  title={`Blog | ${SITE.title}`}
+  description="Long-form technical writing."
+>
+  <Header />
+  <Main pageTitle="Blog" pageDesc="Long-form technical writing.">
+    <SectionPostList
+      posts={getSortedPosts(posts)}
+      emptyText="Long-form research notes will collect here."
+    />
+  </Main>
+  <Footer />
+</Layout>

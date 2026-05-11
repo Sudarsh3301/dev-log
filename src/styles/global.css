@@ -5,25 +5,35 @@
 
 :root,
 html[data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
+  --background: #fefefe;
+  --foreground: #807e7e;
+  --heading: #666;
+  --accent: #a898e9;
+  --muted: #f4f4f4;
+  --border: #ececec;
+  --code-bg: #f4f4f4;
+  --font-sans:
+    "Geist", "Inter", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "Geist Mono", "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
 html[data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --muted: #343f60;
-  --border: #ab4b08;
+  --background: #202020;
+  --foreground: #c8c2c0;
+  --heading: #e2ddda;
+  --accent: #b8a8f2;
+  --muted: #2b2b2b;
+  --border: #393737;
+  --code-bg: #2a2a2a;
 }
 
 @theme inline {
-  --font-app: var(--font-google-sans-code);
+  --font-app: var(--font-sans);
+  --font-mono-app: var(--font-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-heading: var(--heading);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
@@ -39,7 +49,25 @@ html[data-theme="dark"] {
     @apply overflow-y-scroll scroll-smooth;
   }
   body {
-    @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/30 selection:text-heading;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--heading);
+    font-weight: 500;
+  }
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
   }
   a,
   button {
@@ -52,15 +80,217 @@ html[data-theme="dark"] {
 }
 
 @utility max-w-app {
-  @apply max-w-3xl;
+  max-width: 850px;
 }
 
 @utility app-layout {
-  @apply mx-auto w-full max-w-app px-4;
+  width: 100%;
+  max-width: 850px;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+
+@media (max-width: 640px) {
+  .app-layout {
+    padding-inline: 1.25rem;
+  }
 }
 
 .active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding-block: 1.5rem 1rem;
+}
+
+.site-title {
+  color: var(--heading);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.site-nav,
+.home-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+}
+
+.site-nav {
+  justify-content: flex-end;
+  font-size: 0.95rem;
+}
+
+.site-nav a,
+.theme-toggle {
+  color: var(--foreground);
+  opacity: 0.86;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"],
+.theme-toggle:hover {
+  color: var(--accent);
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.theme-toggle {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+}
+
+.home-layout {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 4rem;
+}
+
+.home-layout h1,
+.section-title,
+.post-title {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--heading);
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.home-layout p,
+.section-desc,
+.post-list-desc {
+  margin-bottom: 1rem;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.home-nav {
+  margin-top: 1.5rem;
+  font-size: 17px;
+}
+
+.section-layout,
+.post-layout {
+  padding-block: 3rem 4rem;
+}
+
+.section-desc {
+  margin-bottom: 2rem;
+  color: var(--foreground);
+}
+
+.post-list {
+  margin: 0;
+  padding: 0;
+}
+
+.section-empty {
+  color: var(--foreground);
+  font-size: 17px;
+  opacity: 0.72;
+}
+
+.post-list-item {
+  margin-block: 1.75rem;
+  list-style: none;
+}
+
+.post-list-title {
+  display: inline-block;
+  color: var(--heading);
+}
+
+.post-list-title h2,
+.post-list-title h3 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.post-date {
+  margin-top: 0.3rem;
+  color: var(--foreground);
+  font-size: 0.92rem;
+  opacity: 0.72;
+}
+
+.post-meta {
+  margin-block: 0.25rem 2rem;
+}
+
+.post-article {
+  width: 100%;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-block: 2.5rem;
+  padding: 0;
+}
+
+.tag-token {
+  color: var(--foreground);
+  opacity: 0.65;
+}
+
+.post-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.post-nav a:nth-child(2) {
+  text-align: right;
+}
+
+.post-nav span {
+  color: var(--foreground);
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 2rem;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  opacity: 0.65;
+}
+
+@media (max-width: 700px) {
+  .site-header,
+  .post-nav {
+    display: block;
+  }
+
+  .site-nav {
+    justify-content: flex-start;
+    margin-top: 0.75rem;
+  }
+
+  .post-nav a:nth-child(2) {
+    display: block;
+    margin-top: 1rem;
+    text-align: left;
+  }
 }
 
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
