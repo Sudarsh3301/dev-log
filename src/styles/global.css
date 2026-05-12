@@ -5,32 +5,35 @@
 
 :root,
 html[data-theme="light"] {
-  --background: #fefefe;
-  --foreground: #807e7e;
-  --heading: #666;
-  --accent: #a898e9;
-  --muted: #f4f4f4;
-  --border: #ececec;
-  --code-bg: #f4f4f4;
+  --background: #faf9f5;
+  --foreground: #3d3d3a;
+  --heading: #141413;
+  --accent: #cc785c;
+  --muted: #efe9de;
+  --border: #e6dfd8;
+  --code-bg: #efe9de;
   --font-sans:
-    "Geist", "Inter", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    "Inter", "StyreneB", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono:
-    "Geist Mono", "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+    "JetBrains Mono", "Geist Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --font-serif:
+    "Tiempos Headline", "Copernicus", "Cormorant Garamond", "EB Garamond", serif;
 }
 
 html[data-theme="dark"] {
-  --background: #202020;
-  --foreground: #c8c2c0;
-  --heading: #e2ddda;
-  --accent: #b8a8f2;
-  --muted: #2b2b2b;
+  --background: #181715;
+  --foreground: #a09d96;
+  --heading: #faf9f5;
+  --accent: #cc785c;
+  --muted: #1f1e1b;
   --border: #393737;
-  --code-bg: #2a2a2a;
+  --code-bg: #1f1e1b;
 }
 
 @theme inline {
   --font-app: var(--font-sans);
   --font-mono-app: var(--font-mono);
+  --font-serif-app: var(--font-serif);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-heading: var(--heading);
@@ -60,8 +63,12 @@ html[data-theme="dark"] {
   h5,
   h6 {
     color: var(--heading);
-    font-weight: 500;
+    font-family: var(--font-serif);
+    font-weight: 400;
   }
+  h1 { letter-spacing: -1.5px; }
+  h2 { letter-spacing: -1px; }
+  h3 { letter-spacing: -0.5px; }
   a {
     color: var(--accent);
     text-decoration: none;
