@@ -12,25 +12,32 @@
     h4,
     th {
       color: var(--heading);
-      font-weight: 500;
+      font-family: var(--font-mono);
+      font-weight: 700;
     }
 
     h1 {
-      font-size: 27px;
+      font-size: 17px;
       margin-top: 1.5rem;
       margin-bottom: 1rem;
+      letter-spacing: 0px;
+      line-height: 1.4;
     }
 
     h2 {
-      font-size: 23px;
+      font-size: 17px;
       margin-top: 3rem;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0px;
+      line-height: 1.4;
     }
 
     h3 {
-      font-size: 21px;
+      font-size: 17px;
       margin-top: 3rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0px;
+      line-height: 1.4;
     }
 
     p,
@@ -45,8 +52,8 @@
 
     p,
     li {
-      font-size: 17px;
-      line-height: 1.65;
+      font-size: 16px;
+      line-height: 24px;
     }
 
     p {
@@ -55,11 +62,13 @@
 
     a {
       @apply wrap-break-word underline-offset-4 focus-visible:no-underline;
-      color: var(--accent);
+      color: var(--foreground);
       text-decoration: none;
+      transition: color 0.2s ease-in-out;
     }
 
     a:hover {
+      color: var(--accent);
       text-decoration: underline;
     }
 
@@ -101,11 +110,12 @@
 
     code {
       @apply wrap-break-word before:content-none after:content-none;
-      border-radius: 3px;
+      border-radius: 0px;
       background-color: var(--code-bg);
       padding: 0.2em 0.4em;
       font-family: var(--font-mono);
-      font-size: 0.92em;
+      font-size: 13px;
+      line-height: 18px;
     }
 
     .astro-code code {
@@ -129,7 +139,7 @@
 
     pre {
       @apply focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
-      border-radius: 5px;
+      border-radius: 0px;
       border: 1px solid var(--border);
       background-color: var(--code-bg);
       padding: 1rem;
