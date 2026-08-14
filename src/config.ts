@@ -3,7 +3,7 @@ export const SITE = {
   author: "Sudarsh",
   profile: "https://sudarsh.dev/",
   desc: "A quiet research notebook on AI systems, inference optimization, reasoning architectures, and multimodal AI.",
-  title: "Sudarsh",
+  title: "Übermensch",
   ogImage: "",
   lightAndDarkMode: true,
   postPerIndex: 5,
@@ -23,6 +23,7 @@ export const SITE = {
   // Social links — fill in your own URLs
   github: "https://github.com/sudarsh",
   twitter: "https://x.com/sudarsh",
+  linkedin: "https://linkedin.com/in/sudarsh",
   email: "mailto:sudarsh@example.com",
   googleScholar: "", // e.g. "https://scholar.google.com/citations?user=XXXX"
 } as const;

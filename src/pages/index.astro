@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import { SITE } from "@/config";
 import IconGitHub from "@/assets/icons/IconGitHub.svg";
 import IconBrandX from "@/assets/icons/IconBrandX.svg";
+import IconLinkedin from "@/assets/icons/IconLinkedin.svg";
 import IconMail from "@/assets/icons/IconMail.svg";
 import IconGraduationCap from "@/assets/icons/IconGraduationCap.svg";
 
@@ -31,6 +32,11 @@ const navItems = [
           {SITE.twitter && (
             <a href={SITE.twitter} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on X`}>
               <IconBrandX class="meta-icon-svg" />
+            </a>
+          )}
+          {SITE.linkedin && (
+            <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on LinkedIn`}>
+              <IconLinkedin class="meta-icon-svg" />
             </a>
           )}
           {SITE.email && (

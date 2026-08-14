@@ -435,8 +435,8 @@ html[data-theme="dark"] {
 
 /* Small metadata icons — home page only */
 .meta-icon-svg {
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
   stroke: currentColor;
   fill: none;
   display: block;

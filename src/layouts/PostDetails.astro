@@ -9,6 +9,7 @@ import { slugifyStr } from "@/utils/slugify";
 import { SITE } from "@/config";
 import IconBrandX from "@/assets/icons/IconBrandX.svg";
 import IconGitHub from "@/assets/icons/IconGitHub.svg";
+import IconLinkedin from "@/assets/icons/IconLinkedin.svg";
 import IconMail from "@/assets/icons/IconMail.svg";
 
 type Props = {
@@ -98,6 +99,11 @@ const nextPost =
         {SITE.github && (
           <a href={SITE.github} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on GitHub`}>
             <IconGitHub class="social-icon-svg" />
+          </a>
+        )}
+        {SITE.linkedin && (
+          <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on LinkedIn`}>
+            <IconLinkedin class="social-icon-svg" />
           </a>
         )}
         {SITE.email && (
