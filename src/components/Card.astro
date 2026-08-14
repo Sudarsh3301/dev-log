@@ -14,13 +14,15 @@ const { title, description, ...props } = data;
 ---
 
 <li class="post-list-item">
-  <a href={getPath(id, filePath)} class="post-list-title">
-    <Heading
-      style={{ viewTransitionName: slugifyStr(title.replaceAll(".", "-")) }}
-    >
-      {title}
-    </Heading>
-  </a>
   <Datetime {...props} />
-  <p class="post-list-desc">{description}</p>
+  <div>
+    <a href={getPath(id, filePath)} class="post-list-title">
+      <Heading
+        style={{ viewTransitionName: slugifyStr(title.replaceAll(".", "-")) }}
+      >
+        {title}
+      </Heading>
+    </a>
+    <p class="post-list-desc">{description}</p>
+  </div>
 </li>

@@ -6,7 +6,14 @@ import IconBrandX from "@/assets/icons/IconBrandX.svg";
 import IconMail from "@/assets/icons/IconMail.svg";
 import IconGraduationCap from "@/assets/icons/IconGraduationCap.svg";
 
-const navItems = ["Blog", "Notes", "Lab", "Projects", "Papers", "Random"];
+const navItems = [
+  ["Blog", "Long-form technical writing"],
+  ["Notes", "Short-form observations and fragments"],
+  ["Lab", "Experiments, prototypes, benchmarks"],
+  ["Projects", "Research and project writeups"],
+  ["Papers", "Paper notes, reproductions, reading traces"],
+  ["Random", "Books, inspirations, miscellany"],
+];
 ---
 
 <Layout title={SITE.title} description={SITE.desc}>
@@ -45,7 +52,12 @@ const navItems = ["Blog", "Notes", "Lab", "Projects", "Papers", "Random"];
     <p>My <a href="/random/blogs/motives" target="_blank" class="accent-link">world model</a> is simple: build systems that expose how models think, not just what they output.</p>
 
     <nav class="home-nav" aria-label="Notebook sections">
-      {navItems.map(item => <a href={`/${item.toLowerCase()}`}>{item}</a>)}
+      {navItems.map(([label, desc], i) => (
+        <a href={`/${label.toLowerCase()}`} data-index={String(i + 1).padStart(2, "0")}>
+          <span>{label}</span>
+          <span class="home-nav-desc">{desc}</span>
+        </a>
+      ))}
     </nav>
   </main>
 </Layout>

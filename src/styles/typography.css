@@ -3,52 +3,19 @@
 @layer base {
   /* ===== Override default Tailwind Typography styles ===== */
   .app-prose {
-    @apply prose max-w-none;
-    color: var(--foreground);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .app-prose h2, .app-prose h3 { font-family: var(--font-serif); font-weight: 600; }
+  .app-prose p, .app-prose li { font-family: var(--font-serif); font-size: 18px; line-height: 1.7; }
+  .app-prose code, .app-prose pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(40,30,15,0.04);
+  }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    th {
-      color: var(--heading);
-      font-family: var(--font-mono);
-      font-weight: 700;
-    }
 
-    h1 {
-      font-size: 17px;
-      margin-top: 1.5rem;
-      margin-bottom: 1rem;
-      letter-spacing: 0px;
-      line-height: 1.4;
-    }
-
-    h2 {
-      font-size: 17px;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      letter-spacing: 0px;
-      line-height: 1.4;
-    }
-
-    h3 {
-      font-size: 17px;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      letter-spacing: 0px;
-      line-height: 1.4;
-    }
-
-    p,
-    strong,
-    ol,
-    ul,
-    figcaption,
-    table,
-    code {
-      color: var(--foreground);
-    }
 
     p,
     li {
@@ -147,6 +114,11 @@
   }
 
   .katex-display {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(40,30,15,0.04);
     overflow-x: auto;
     overflow-y: hidden;
     color: var(--heading);
