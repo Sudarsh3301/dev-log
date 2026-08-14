@@ -2,19 +2,16 @@
 
 @layer base {
   /* ===== Override default Tailwind Typography styles ===== */
-  .app-prose {
-    font-family: var(--font-serif);
-    font-size: 18px;
-    line-height: 1.7;
-  }
-  .app-prose h2, .app-prose h3 { font-family: var(--font-serif); font-weight: 600; }
-  .app-prose p, .app-prose li { font-family: var(--font-serif); font-size: 18px; line-height: 1.7; }
-  .app-prose code, .app-prose pre {
+  .app-prose pre {
     background: var(--code-bg);
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 2px rgba(40,30,15,0.04);
+    color: var(--code-fg);
+    border: 1px solid var(--heading);
+    border-radius: 0;
+    padding: 18px;
+    font-size: 12.5px;
   }
-
+  .app-prose code { background: var(--muted); border: 1px solid var(--border); font-size: 12.5px; }
+  .app-prose h2::before { content: "// "; color: var(--accent); }
 
 
     p,
@@ -114,14 +111,11 @@
   }
 
   .katex-display {
-    margin: 28px 0;
-    padding: 20px 24px;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 2px rgba(40,30,15,0.04);
-    overflow-x: auto;
-    overflow-y: hidden;
-    color: var(--heading);
+    margin: 24px 0;
+    padding: 18px;
+    background: var(--muted);
+    border: 1px dashed var(--heading);
+    text-align: center;
   }
 
   /* ===== Code Blocks & Syntax Highlighting ===== */

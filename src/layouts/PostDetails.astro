@@ -87,6 +87,7 @@ const nextPost =
     >
       {title}
     </h1>
+    <div class="rev-line">rev. {tags.length} · reviewed {pubDatetime.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</div>
     <div class="author-info">
       <div class="social-links">
         {SITE.twitter && (
@@ -146,7 +147,7 @@ const nextPost =
       }
     </nav>
   </main>
-  <Footer />
+  <Footer currentPostIndex={currentPostIndex} totalPosts={allPosts.length} />
 </Layout>
 
 <script is:inline data-astro-rerun>

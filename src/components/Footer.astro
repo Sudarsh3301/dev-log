@@ -6,9 +6,11 @@ const currentYear = new Date().getFullYear();
 
 type Props = {
   noMarginTop?: boolean;
+  currentPostIndex?: number;
+  totalPosts?: number;
 } & HTMLAttributes<"footer">;
 
-const { noMarginTop = false, class: className, ...attrs } = Astro.props;
+const { noMarginTop = false, currentPostIndex, totalPosts, class: className, ...attrs } = Astro.props;
 ---
 
 <footer
@@ -19,6 +21,6 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
   ]}
   {...attrs}
 >
-  <span>© {currentYear} {SITE.author}</span>
+  <span>© {currentYear} {SITE.author} — <span class="commit">{import.meta.env.PUBLIC_COMMIT_SHA ?? "local"}</span>{currentPostIndex !== undefined && totalPosts !== undefined && ` — pg. ${String(currentPostIndex + 1).padStart(3, "0")}`}</span>
   <a href="/rss.xml">rss</a>
 </footer>
