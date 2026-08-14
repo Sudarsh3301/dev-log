@@ -13,7 +13,7 @@
   .app-prose code { background: var(--muted); border: 1px solid var(--border); font-size: 12.5px; }
   .app-prose h2::before { content: "// "; color: var(--accent); }
 
-
+  .app-prose {
     p,
     li {
       font-size: 16px;
