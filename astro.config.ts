@@ -29,7 +29,7 @@ export default defineConfig({
       remarkToc,
       [remarkCollapse, { test: "Table of contents" }],
     ],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [rehypeKatex as any],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "github-dark" },
