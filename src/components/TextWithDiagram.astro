@@ -1,0 +1,109 @@
+---
+/**
+ * TextWithDiagram — pairs one paragraph of prose with one diagram in a shared row.
+ *
+ * The single layout that plain markdown cannot express. Use only for diagram slots
+ * marked `PAIRING: paired` in the outline; `full` slots need no component.
+ *
+ * Usage in .mdx (note the blank lines around the markdown child — without them
+ * MDX renders the text literally, with no emphasis or inline code):
+ *
+ *   import TextWithDiagram from "@/components/TextWithDiagram.astro";
+ *
+ *   <TextWithDiagram caption="One thread owns one row — and pays for it three times.">
+ *
+ *     Once the threads are assigned to their rows, there are three stages to the
+ *     computation — mean, variance, and combining them.
+ *
+ *     <img slot="diagram" src="/ln-worklog/image1.png" alt="..." />
+ *   </TextWithDiagram>
+ */
+interface Props {
+  /** Which side the diagram sits on. Default "right". */
+  side?: "left" | "right";
+  /** Diagram column width as a CSS grid fraction. Default "42%". */
+  width?: string;
+  /** Optional caption rendered under the diagram. */
+  caption?: string;
+}
+
+const { side = "right", width = "42%", caption } = Astro.props;
+---
+
+<div class="twd" data-side={side} style={`--twd-diagram-width: ${width};`}>
+  <div class="twd-text">
+    <slot />
+  </div>
+  <figure class="twd-diagram">
+    <slot name="diagram" />
+    {caption && <figcaption>{caption}</figcaption>}
+  </figure>
+</div>
+
+<style>
+  .twd {
+    display: grid;
+    gap: 1.75rem;
+    align-items: start;
+    margin: 1.75rem 0;
+    grid-template-columns: 1fr var(--twd-diagram-width, 42%);
+  }
+
+  /* Diagram on the left: swap column order without touching source order,
+     so screen readers and mobile keep prose-then-diagram. */
+  .twd[data-side="left"] {
+    grid-template-columns: var(--twd-diagram-width, 42%) 1fr;
+  }
+  .twd[data-side="left"] .twd-text {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .twd[data-side="left"] .twd-diagram {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .twd-text > :global(:first-child) {
+    margin-top: 0;
+  }
+  .twd-text > :global(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .twd-diagram {
+    margin: 0;
+  }
+
+  /* The override that matters. A contained-width rule on `.app-prose img`
+     (max-width: min(100%, 46rem)) is correct for full-width diagrams but
+     squeezes this one a second time inside its half-width column. */
+  .twd-diagram :global(img) {
+    max-width: none;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .twd-diagram figcaption {
+    margin-top: 0.45rem;
+    text-align: center;
+    font-size: 0.78em;
+    /* Theme variables, never hardcoded hex — this has to survive dark mode. */
+    color: var(--foreground);
+    opacity: 0.7;
+  }
+
+  /* Collapse to stacked. Prose first, diagram second — matching source order. */
+  @media (max-width: 700px) {
+    .twd,
+    .twd[data-side="left"] {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .twd[data-side="left"] .twd-text,
+    .twd[data-side="left"] .twd-diagram {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+</style>
