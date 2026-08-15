@@ -50,6 +50,15 @@
 
     img {
       @apply mx-auto border border-border;
+      max-width: min(100%, 46rem);
+      height: auto;
+    }
+
+    /* Paired diagrams already sit in a half-width column — opt them out of the
+       contained-width rule above, or they get squeezed a second time. */
+    .twd-diagram img {
+      max-width: none;
+      width: 100%;
     }
 
     figcaption {
@@ -80,6 +89,14 @@
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 18px;
+    }
+
+    /* Inline tokens: pill shape, and an explicit light foreground. Without the
+       color, inline code inherits the page's dark ink onto a dark pill.
+       Scoped with :not(pre) > so fenced blocks keep square corners. */
+    :not(pre) > code {
+      border-radius: 0.375rem;
+      color: var(--code-fg);
     }
 
     .astro-code code {
@@ -118,15 +135,23 @@
     text-align: center;
   }
 
-  /* ===== Code Blocks & Syntax Highlighting ===== */
+  /* ===== Code Blocks & Syntax Highlighting =====
+     --code-bg is DARK in BOTH themes (#1e1c17 light / #13120f dark), so code
+     blocks must always use the DARK token palette. Using --shiki-light here
+     painted min-light's near-black tokens onto a near-black background — which
+     is why identifiers, punctuation and plaintext output were unreadable in
+     light mode while only keywords and operators showed through. */
   .astro-code {
-    @apply flex outline-border [&_span]:text-(--shiki-light);
+    @apply flex outline-border [&_span]:text-(--shiki-dark);
     border: 1px solid var(--border);
     background-color: var(--code-bg) !important;
+    color: var(--code-fg);
   }
 
   html[data-theme="dark"] .astro-code {
-    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+    @apply [&_span]:text-(--shiki-dark);
+    background-color: var(--code-bg) !important;
+    color: var(--code-fg);
   }
 
   /* Styles for Shiki transformers */
