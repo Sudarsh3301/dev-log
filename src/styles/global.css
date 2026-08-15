@@ -13,8 +13,13 @@ html[data-theme="light"] {
   --muted: #fffdf5;
   --border: #cfc9b8;
   --border-dashed: #cfc9b8;
-  --code-bg: #1e1c17;
-  --code-fg: #d8d2c4;
+  /* Code sits on raised paper, one step lighter than the page — not a black
+     panel. Because the block now follows the page theme, Shiki's light palette
+     (min-light, built for a near-white ground) is the correct one again. */
+  --code-bg: #fffdf5;
+  --code-fg: #45403a;
+  --code-border: #ded7c5;
+  --code-inline-bg: #efe9da;
   --font-sans: "JetBrains Mono", "Courier New", monospace;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 }
@@ -27,8 +32,10 @@ html[data-theme="dark"] {
   --accent: #d98a6f;
   --muted: #24221c;
   --border: #35312a;
-  --code-bg: #13120f;
-  --code-fg: #d8d2c4;
+  --code-bg: #24221c;
+  --code-fg: #bdb5a4;
+  --code-border: #35312a;
+  --code-inline-bg: #2e2b23;
 }
 
 @theme inline {

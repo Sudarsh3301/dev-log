@@ -2,15 +2,20 @@
 
 @layer base {
   /* ===== Override default Tailwind Typography styles ===== */
+  /* ===== Code: three tiers of deliberately unequal weight =====
+     1. inline token — a tint inside the sentence, no chip
+     2. source block — raised paper, hairline rule, syntax highlighted
+     3. output block — quietest: no fill, dashed rule, dimmed
+     Prose stays the loudest element on the page. */
   .app-prose pre {
-    background: var(--code-bg);
+    background: transparent;
     color: var(--code-fg);
-    border: 1px solid var(--heading);
+    border: 0;
+    border-left: 2px solid var(--code-border);
     border-radius: 0;
-    padding: 18px;
+    padding: 2px 0 2px 18px;
     font-size: 12.5px;
   }
-  .app-prose code { background: var(--muted); border: 1px solid var(--border); font-size: 12.5px; }
   .app-prose h2::before { content: "// "; color: var(--accent); }
 
   .app-prose {
@@ -84,19 +89,23 @@
     code {
       @apply wrap-break-word before:content-none after:content-none;
       border-radius: 0px;
-      background-color: var(--code-bg);
-      padding: 0.2em 0.4em;
+      background-color: transparent;
+      padding: 0;
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 18px;
     }
 
-    /* Inline tokens: pill shape, and an explicit light foreground. Without the
-       color, inline code inherits the page's dark ink onto a dark pill.
-       Scoped with :not(pre) > so fenced blocks keep square corners. */
+    /* TIER 1 — inline tokens. A faint tint carrying the sentence, not a chip
+       pasted into it: no border, minimal padding, ink-colored text. Scoped
+       with :not(pre) > so fenced blocks are untouched. */
     :not(pre) > code {
-      border-radius: 0.375rem;
-      color: var(--code-fg);
+      background-color: var(--code-inline-bg);
+      color: var(--heading);
+      border: 0;
+      border-radius: 3px;
+      padding: 0.1em 0.32em;
+      font-size: 0.92em;
     }
 
     .astro-code code {
@@ -119,39 +128,64 @@
     }
 
     pre {
-      @apply focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
+      @apply focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
       border-radius: 0px;
-      border: 1px solid var(--border);
-      background-color: var(--code-bg);
-      padding: 1rem;
+      border: 0;
+      border-left: 2px solid var(--code-border);
+      background-color: transparent;
+      padding: 2px 0 2px 1rem;
     }
   }
 
+  /* Math displays share the dashed-rule language with output blocks, but keep
+     their fill — softened from the near-black --heading to the same hairline
+     used by code, so no block on the page carries a heavy border. */
   .katex-display {
     margin: 24px 0;
     padding: 18px;
     background: var(--muted);
-    border: 1px dashed var(--heading);
+    border: 1px dashed var(--border);
     text-align: center;
   }
 
-  /* ===== Code Blocks & Syntax Highlighting =====
-     --code-bg is DARK in BOTH themes (#1e1c17 light / #13120f dark), so code
-     blocks must always use the DARK token palette. Using --shiki-light here
-     painted min-light's near-black tokens onto a near-black background — which
-     is why identifiers, punctuation and plaintext output were unreadable in
-     light mode while only keywords and operators showed through. */
+  /* ===== TIER 2 — source blocks =====
+     The token palette must match the block's background, not the page's. Now
+     that --code-bg follows the theme (raised paper in light, raised ink in
+     dark), the theme-matched Shiki palettes are correct: min-light is built
+     for a near-white ground, github-dark for a dark one. */
   .astro-code {
-    @apply flex outline-border [&_span]:text-(--shiki-dark);
-    border: 1px solid var(--border);
-    background-color: var(--code-bg) !important;
+    @apply flex [&_span]:text-(--shiki-light);
+    border: 0;
+    border-left: 2px solid var(--code-border);
+    background-color: transparent !important;
     color: var(--code-fg);
   }
 
   html[data-theme="dark"] .astro-code {
     @apply [&_span]:text-(--shiki-dark);
-    background-color: var(--code-bg) !important;
+    background-color: transparent !important;
     color: var(--code-fg);
+  }
+
+  /* ===== TIER 3 — output / result blocks =====
+     Benchmark output is evidence, not source. It gets the lightest treatment
+     on the page: no fill, a dashed rule echoing the KaTeX display convention,
+     and dimmed text — so a result never competes with the kernel above it.
+     Astro emits data-language; the class is kept as a fallback. */
+  .app-prose pre.astro-code[data-language="plaintext"],
+  .app-prose pre.astro-code[data-language="text"],
+  .app-prose pre.astro-code.language-plaintext {
+    background-color: transparent !important;
+    border: 0;
+    border-left: 2px dashed var(--border);
+    color: var(--muted-text);
+    padding: 2px 0 2px 18px;
+  }
+
+  .app-prose pre.astro-code[data-language="plaintext"] span,
+  .app-prose pre.astro-code[data-language="text"] span,
+  .app-prose pre.astro-code.language-plaintext span {
+    color: var(--muted-text) !important;
   }
 
   /* Styles for Shiki transformers */
