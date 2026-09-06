@@ -24,5 +24,6 @@ pnpm-debug.log*
 .idea/
 example/
 # pagefind
-
+CLAUDE.md
+*.skill
 public/pagefind

@@ -1,7 +1,7 @@
 export const SITE = {
-  website: "https://sudarsh.dev/",
+  website: "https://gedanken.tech/",
   author: "Sudarsh",
-  profile: "https://sudarsh.dev/",
+  profile: "https://gedanken.tech/",
   desc: "A quiet research notebook on AI systems, inference optimization, reasoning architectures, and multimodal AI.",
   title: "Übermensch",
   ogImage: "",
@@ -21,9 +21,9 @@ export const SITE = {
   lang: "en", // html lang code. Set this empty and default will be "en"
   timezone: "Asia/Kolkata", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   // Social links — fill in your own URLs
-  github: "https://github.com/sudarsh",
-  twitter: "https://x.com/sudarsh",
-  linkedin: "https://linkedin.com/in/sudarsh",
-  email: "mailto:sudarsh@example.com",
+  github: "https://github.com/sudarsh3301",
+  twitter: "https://x.com/Sudarsh3301",
+  linkedin: "https://www.linkedin.com/in/sudarsh-chaturvedi/",
+  email: "mailto:chaturvedi.sudarsh@gmail.com",
   googleScholar: "", // e.g. "https://scholar.google.com/citations?user=XXXX"
 } as const;
