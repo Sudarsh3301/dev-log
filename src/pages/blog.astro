@@ -6,10 +6,15 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import SectionPostList from "@/components/SectionPostList.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
-import notebookPostFilter from "@/utils/notebookPostFilter";
+import { hasNotebookTag, hasSectionTag } from "@/utils/notebookPostFilter";
 import { SITE } from "@/config";
 
-const posts = await getCollection("blog", post => notebookPostFilter(post));
+// The default feed excludes anything claimed by a more specific section
+// (Random/Papers/Lab/Notes/Projects) so a post lands in exactly one place.
+const posts = await getCollection(
+  "blog",
+  ({ data }) => hasNotebookTag(data.tags) && !hasSectionTag(data.tags)
+);
 ---
 
 <Layout
