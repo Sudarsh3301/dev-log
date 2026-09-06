@@ -15,6 +15,7 @@
     border-radius: 0;
     padding: 2px 0 2px 18px;
     font-size: 12.5px;
+    overflow-x: auto;
   }
   .app-prose h2::before { content: "// "; color: var(--accent); }
 
@@ -134,6 +135,7 @@
       border-left: 2px solid var(--code-border);
       background-color: transparent;
       padding: 2px 0 2px 1rem;
+      overflow-x: auto;
     }
   }
 
