@@ -1,2 +1,5 @@
+allowBuilds:
+  esbuild: set this to true or false
+  sharp: set this to true or false
 overrides:
   "@types/hast": "^3.0.4"
