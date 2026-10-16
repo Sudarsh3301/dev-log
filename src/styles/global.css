@@ -26,9 +26,9 @@
   --violet: #7a6cf0;
   --cyan: #5ed4e6;
   --gold: #d9c29a;
-  --code-bg: var(--ink);
-  --code-fg: var(--ink-fg);
-  --code-border: var(--ink-border);
+  --code-bg: #f5f2f0;
+  --code-fg: var(--foreground);
+  --code-border: var(--border);
   --code-inline-bg: #e9e8ee;
   --font-serif: "Newsreader", Georgia, serif;
   --font-ui: "Instrument Sans", system-ui, sans-serif;

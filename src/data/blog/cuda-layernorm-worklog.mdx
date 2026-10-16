@@ -113,7 +113,7 @@ This line of code assigns the row index that the current thread will process:
 int row = threadIdx.x + (blockDim.x * blockIdx.x);
 ```
 
-![One thread per row: each thread runs all three serial passes — mean loop, variance loop, normalize loop — reading the same row from global memory three separate times](/ln_images/image1.png)
+<p><img src="/ln_images/image1.png" alt="One thread per row: each thread runs all three serial passes — mean loop, variance loop, normalize loop — reading the same row from global memory three separate times" style={{ maxWidth: "70%" }} /></p>
 
 Once the threads are assigned to their rows, there are three stages to the layer norm computation — mean, variance, and putting them both together to find the norm. Let's analyse the three loops:
 
@@ -213,11 +213,11 @@ smem[tidx] = lmean; // contains the sum of all values loaded by thread tidx
 
 Each thread accumulates the sum of the elements it loaded and stores it in shared memory `smem`.
 
-![Each thread's partial sum lands in smem[tidx]: 256 values distributed across shared memory, one per thread — the input to the log₂(256)=8 step reduction tree](/ln_images/image4.png)
+<p><img src="/ln_images/image4.png" alt="Each thread's partial sum lands in smem[tidx]: 256 values distributed across shared memory, one per thread — the input to the log₂(256)=8 step reduction tree" style={{ maxWidth: "40%" }} /></p>
 
 Now that we have all the local sums, it's time for **reductions**. We need to find the total sum of all elements in shared memory so we can compute the mean. This is done in log(n) steps as we reduce hierarchically. Eventually, the global sum ends up in the first index `smem[0]`. In the example below, assume the 8 random values are the local sums each thread just computed.
 
-![Stride-halving tree reduction: 8 values reduce to 1 in log₂(8)=3 steps — each step, smem[tidx] += smem[tidx+stride], halving active threads until smem[0] holds the global sum](/ln_images/image5.png)
+<p><img src="/ln_images/image5.png" alt="Stride-halving tree reduction: 8 values reduce to 1 in log₂(8)=3 steps — each step, smem[tidx] += smem[tidx+stride], halving active threads until smem[0] holds the global sum" style={{ maxWidth: "60%" }} /></p>
 
 `stride` begins as half of `blockDim.x`, and is halved as we iterate. The thread elements within the first stride are added to the thread elements at `tidx + stride`. As you can see, the final sum accumulates at the first index of shared memory. We can then divide by `n` to compute the global mean for each row, followed by the global variance similarly.
 
@@ -269,7 +269,7 @@ __syncthreads();
 float lrmean = lmean;
 ```
 
-![Register vs shared memory: smem[tidx]=lmean (kernel 2, ❌) vs float lrmean=lmean (kernel 3, ✅) — keeping the partial sum in the thread's own register eliminates the write-to-smem step for intra-warp accumulation](/ln_images/image7.png)
+<p><img src="/ln_images/image7.png" alt="Register vs shared memory: smem[tidx]=lmean (kernel 2, ❌) vs float lrmean=lmean (kernel 3, ✅) — keeping the partial sum in the thread's own register eliminates the write-to-smem step for intra-warp accumulation" style={{ maxWidth: "40%" }} /></p>
 
 The key difference from kernel 2: instead of storing local sums into shared memory (`smem[tidx] = lmean`) ❌, we store it in the thread's own register (`float lrmean = lmean`) ✅ and use shuffle functions to pass values across threads in a warp.
 
@@ -277,7 +277,7 @@ The key difference from kernel 2: instead of storing local sums into shared memo
 
 Similar to how we used strides in kernel 2 to reduce shared memory, we stride across warps in a block to find the sum of each warp in log(n) steps. `__shfl_down_sync` moves values down a warp by an offset. At the end of the loop, the warp's final sum is at its first index. `0xffffffff` sets the mask to all threads in the warp.
 
-![\_\_shfl_down_sync with offsets 16,8,4,2,1: each thread adds the value from the thread offset lanes ahead, reducing 32 lanes to a single warp sum in 5 steps — zero shared memory writes](/ln_images/image8.png)
+<p><img src="/ln_images/image8.png" alt="__shfl_down_sync with offsets 16,8,4,2,1: each thread adds the value from the thread offset lanes ahead, reducing 32 lanes to a single warp sum in 5 steps — zero shared memory writes" style={{ maxWidth: "70%" }} /></p>
 
 ```cpp
 // global mean, warp level using shuffling
@@ -289,7 +289,7 @@ for(int offset = warp_size/2; offset > 0; offset /= 2){
 
 Next, we save the warp sums into shared memory to reduce them further across the block:
 
-![8 warp sums written to smem[0..7] by each warp's first thread, then the first warp loads all 8, performs one final shuffle reduction, and writes the block sum to smem[0]](/ln_images/image9.png)
+<p><img src="/ln_images/image9.png" alt="8 warp sums written to smem[0..7] by each warp's first thread, then the first warp loads all 8, performs one final shuffle reduction, and writes the block sum to smem[0]" style={{ maxWidth: "60%" }} /></p>
 
 ```cpp
 // global mean, block level using shuffling
@@ -318,7 +318,7 @@ float gmean = smem[0] / n; // global mean stored at first index of smem
 
 We then repeat the same warp and block reduction pattern to compute global variance:
 
-![Variance reduction mirrors mean reduction: lrvar accumulates v²·sums per thread, warp shuffle reduces within each warp, smem combines the 8 warp results, gvar = smem[0]/n − gmean²](/ln_images/image10.png)
+<p><img src="/ln_images/image10.png" alt="Variance reduction mirrors mean reduction: lrvar accumulates v²·sums per thread, warp shuffle reduces within each warp, smem combines the 8 warp results, gvar = smem[0]/n − gmean²" style={{ maxWidth: "60%" }} /></p>
 
 ```cpp
 float lrvar = lvar;
@@ -379,7 +379,7 @@ for(int i = tidx; i < vec_iters; i += blockDim.x){
 }
 ```
 
-![float4 struct maps v.x, v.y, v.z, v.w to four consecutive memory addresses — one reinterpret_cast loads a 128-bit word so the thread accumulates four elements in a single memory instruction](/ln_images/image12.png)
+<p><img src="/ln_images/image12.png" alt="float4 struct maps v.x, v.y, v.z, v.w to four consecutive memory addresses — one reinterpret_cast loads a 128-bit word so the thread accumulates four elements in a single memory instruction" style={{ maxWidth: "40%" }} /></p>
 
 `float4` is a built-in struct, so the four loaded values are accessed via `v.x, v.y, v.z, v.w`. In each iteration, one thread loads 4 elements and sums them to compute local mean and variance — much more efficient than scalar coalescing.
 
@@ -432,4 +432,4 @@ Each kernel improvement exposed a concrete bottleneck: global memory traffic, sh
 
 You can find the code implementations for all four kernels in my [GitHub](https://github.com/aryagxr/cuda).
 
-![Hand-drawn cat waving goodbye — the worklog's sign-off](/ln_images/byecat.png)
+<p><img src="/ln_images/byecat.png" alt="Hand-drawn cat waving goodbye — the worklog's sign-off" style={{ maxWidth: "20%" }} /></p>

@@ -154,13 +154,13 @@
       font-size: 14px;
     }
 
-    /* Source blocks sit on a midnight-ink panel: dark surface for hierarchy. */
+    /* Source blocks sit on a warm paper panel, like the reference worklog. */
     pre {
       @apply focus-visible:outline-2 focus-visible:outline-accent;
       margin-block: 0 2rem;
       padding: 1.1rem 1.25rem;
       border: 0;
-      border-radius: 0;
+      border-radius: 5px;
       background-color: var(--code-bg);
       color: var(--code-fg);
       font-size: 13.5px;
@@ -177,9 +177,9 @@
     text-align: center;
   }
 
-  /* Code is always on ink, so always use Shiki's dark palette. */
+  /* Code is always on paper, so always use Shiki's light palette. */
   .astro-code {
-    @apply flex [&_span]:text-(--shiki-dark);
+    @apply flex [&_span]:text-(--shiki-light);
     background-color: var(--code-bg) !important;
     color: var(--code-fg);
   }
@@ -190,9 +190,9 @@
 
   .copy-code {
     font-family: var(--font-ui);
-    background: rgb(255 255 255 / 0.06);
-    border: 1px solid var(--ink-border);
-    color: var(--ink-fg);
+    background: rgb(0 0 0 / 0.04);
+    border: 1px solid var(--code-border);
+    color: var(--muted-text);
   }
 
   /* Output / result blocks are evidence, not source: quietest treatment,
