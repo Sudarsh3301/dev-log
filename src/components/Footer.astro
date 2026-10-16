@@ -2,25 +2,12 @@
 import type { HTMLAttributes } from "astro/types";
 import { SITE } from "@/config";
 
-const currentYear = new Date().getFullYear();
+type Props = HTMLAttributes<"footer">;
 
-type Props = {
-  noMarginTop?: boolean;
-  currentPostIndex?: number;
-  totalPosts?: number;
-} & HTMLAttributes<"footer">;
-
-const { noMarginTop = false, currentPostIndex, totalPosts, class: className, ...attrs } = Astro.props;
+const { class: className, ...attrs } = Astro.props;
 ---
 
-<footer
-  class:list={[
-    "site-footer app-layout",
-    { "mt-auto": !noMarginTop },
-    className,
-  ]}
-  {...attrs}
->
-  <span>© {currentYear} {SITE.author} — <span class="commit">{import.meta.env.PUBLIC_COMMIT_SHA ?? "local"}</span>{currentPostIndex !== undefined && totalPosts !== undefined && ` — pg. ${String(currentPostIndex + 1).padStart(3, "0")}`}</span>
-  <a href="/rss.xml">rss</a>
+<footer class:list={["site-footer app-layout mt-auto", className]} {...attrs}>
+  <span>© {new Date().getFullYear()} {SITE.author}</span>
+  <a href="/rss.xml">RSS</a>
 </footer>

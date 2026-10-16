@@ -45,6 +45,16 @@ const SECTION_TAGS = [
   ["project", "projects"],
 ];
 
+const SECTION_LABELS = ["Random", "Paper", "Lab", "Note", "Project"];
+
+// Which section a post lands in, as a short label for post lists.
+export const sectionLabel = (tags: string[]) => {
+  const i = SECTION_TAGS.findIndex(section =>
+    tags.some(tag => section.includes(tag.toLowerCase()))
+  );
+  return i === -1 ? "Blog" : SECTION_LABELS[i];
+};
+
 export const hasSectionTag = (tags: string[]) =>
   SECTION_TAGS.some(section =>
     tags.some(tag => section.includes(tag.toLowerCase()))

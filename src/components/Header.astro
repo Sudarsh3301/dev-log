@@ -2,17 +2,7 @@
 import { SITE } from "@/config";
 
 const { pathname } = Astro.url;
-
-// Remove trailing slash from current pathname if exists
-const currentPath =
-  pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
-
-const isActive = (path: string) => {
-  const currentPathArray = currentPath.split("/").filter(p => p.trim());
-  const pathArray = path.split("/").filter(p => p.trim());
-
-  return currentPath === path || currentPathArray[0] === pathArray[0];
-};
+const first = pathname.split("/").filter(Boolean)[0];
 
 const navItems = [
   ["Blog", "/blog"],
@@ -28,28 +18,22 @@ const navItems = [
 <a
   id="skip-to-content"
   href="#main-content"
-  class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+  class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent transition-all focus:top-4"
 >
   Skip to content
 </a>
 
-<header class="site-header app-layout">
-  <a href="/" class="site-title">{SITE.title}</a>
-  <nav class="site-nav" aria-label="Primary navigation">
-    {
-      navItems.map(([label, href]) => (
-        <a href={href} aria-current={isActive(href) ? "page" : undefined}>
-          {label}
-        </a>
-      ))
-    }
-    {
-      SITE.lightAndDarkMode && (
-        <button id="theme-btn" class="theme-toggle" title="Toggle theme">
-          <span class="dark:hidden">dark</span>
-          <span class="hidden dark:inline">light</span>
-        </button>
-      )
-    }
-  </nav>
-</header>
+<div class="site-header-wrap">
+  <header class="site-header app-layout">
+    <a href="/" class="site-title">{SITE.title}</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      {
+        navItems.map(([label, href]) => (
+          <a href={href} aria-current={first === href.slice(1) ? "page" : undefined}>
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+  </header>
+</div>

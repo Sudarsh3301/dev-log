@@ -1,0 +1,24 @@
+<div class="cursor is-hidden" aria-hidden="true" transition:persist><span></span></div>
+
+<script>
+  // Desktop pointers only; touch devices keep the native behaviour.
+  if (matchMedia("(pointer: fine)").matches) {
+    document.documentElement.classList.add("has-cursor");
+    const el = () => document.querySelector<HTMLElement>(".cursor");
+
+    document.addEventListener("mousemove", e => {
+      const c = el();
+      if (!c) return;
+      const t = e.target as Element;
+      const read = t.closest?.("[data-cursor='read']");
+      const link = !read && t.closest?.("a, button, summary, label");
+      c.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+      c.classList.remove("is-hidden");
+      c.classList.toggle("is-read", !!read);
+      c.classList.toggle("is-link", !!link);
+      c.classList.toggle("on-ink", !!t.closest?.("pre"));
+      c.querySelector("span")!.textContent = read ? "Read →" : "";
+    });
+    document.addEventListener("mouseleave", () => el()?.classList.add("is-hidden"));
+  }
+</script>

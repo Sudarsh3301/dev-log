@@ -30,7 +30,7 @@ const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
   postTimezone || SITE.timezone
 );
 
-const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
+const date = datetime.format("D MMMM YYYY"); // e.g., '22 March 2025'
 ---
 
 <div class:list={["post-date", className]}>

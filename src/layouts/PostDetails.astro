@@ -7,10 +7,7 @@ import Tag from "@/components/Tag.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import { SITE } from "@/config";
-import IconBrandX from "@/assets/icons/IconBrandX.svg";
-import IconGitHub from "@/assets/icons/IconGitHub.svg";
-import IconLinkedin from "@/assets/icons/IconLinkedin.svg";
-import IconMail from "@/assets/icons/IconMail.svg";
+import { Image } from "astro:assets";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -81,100 +78,76 @@ const nextPost =
 
 <Layout {...layoutProps}>
   <Header />
-  <main id="main-content" class="post-layout app-layout" data-pagefind-body>
-    <h1
-      transition:name={slugifyStr(title.replaceAll(".", "-"))}
-      class="post-title"
-    >
-      {title}
-    </h1>
-    <div class="rev-line">rev. {tags.length} · reviewed {pubDatetime.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</div>
-    <div class="author-info">
-      <div class="social-links">
-        {SITE.twitter && (
-          <a href={SITE.twitter} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on X`}>
-            <IconBrandX class="social-icon-svg" />
-          </a>
-        )}
-        {SITE.github && (
-          <a href={SITE.github} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on GitHub`}>
-            <IconGitHub class="social-icon-svg" />
-          </a>
-        )}
-        {SITE.linkedin && (
-          <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on LinkedIn`}>
-            <IconLinkedin class="social-icon-svg" />
-          </a>
-        )}
-        {SITE.email && (
-          <a href={SITE.email} target="_blank" rel="noopener noreferrer" title={`Email ${SITE.author}`}>
-            <IconMail class="social-icon-svg" />
-          </a>
-        )}
+  <main id="main-content" class="app-layout" data-pagefind-body>
+    <header class="post-head">
+      <div class="ui-label">{tags.slice(0, 3).join(" · ")}</div>
+      <h1 transition:name={slugifyStr(title.replaceAll(".", "-"))} class="post-title">
+        {title}
+      </h1>
+      <p class="post-dek">{description}</p>
+      <div class="post-byline">
+        {author} ·{" "}
+        <time datetime={pubDatetime.toISOString()}>
+          {pubDatetime.toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
+        </time>
       </div>
-      <div class="author-details">
-        <a href={SITE.profile || SITE.website} target="_blank" rel="noopener noreferrer">
-          By {SITE.author}
-        </a>
+    </header>
+
+    {
+      typeof initOgImage === "object" && initOgImage && (
+        <div class="art-frame post-cover">
+          <Image src={initOgImage} alt="" widths={[800, 1200, 1600]} sizes="(max-width: 1160px) 100vw, 1080px" />
+        </div>
+      )
+    }
+
+    <div class="post-grid">
+      <nav class="post-toc" id="post-toc" aria-label="Contents" data-pagefind-ignore>
+        <span class="ui-label">Contents</span>
+      </nav>
+      <div class="post-article">
+        <article id="article" class="app-prose">
+          <Content />
+        </article>
+
+        <ul class="tag-list">
+          {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
+        </ul>
+
+        <nav data-pagefind-ignore class="post-nav" aria-label="Adjacent posts">
+          {
+            prevPost && (
+              <a href={getPath(prevPost.id, prevPost.filePath)} data-cursor="read">
+                <span class="ui-label">Previous</span>
+                {prevPost.title}
+              </a>
+            )
+          }
+          {
+            nextPost && (
+              <a href={getPath(nextPost.id, nextPost.filePath)} data-cursor="read">
+                <span class="ui-label">Next</span>
+                {nextPost.title}
+              </a>
+            )
+          }
+        </nav>
       </div>
-      <div class="post-date">
-        {pubDatetime.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-      </div>
+      <div class="post-margin"></div>
     </div>
-    <article id="article" class="app-prose post-article">
-      <Content />
-    </article>
-
-    <ul class="tag-list">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
-    </ul>
-
-    <!-- Previous/Next Post Buttons -->
-    <nav data-pagefind-ignore class="post-nav" aria-label="Adjacent posts">
-      {
-        prevPost && (
-          <a href={getPath(prevPost.id, prevPost.filePath)}>
-            <div>
-              <span>Previous</span>
-              <div>{prevPost.title}</div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a href={getPath(nextPost.id, nextPost.filePath)}>
-            <div>
-              <span>Next</span>
-              <div>{nextPost.title}</div>
-            </div>
-          </a>
-        )
-      }
-    </nav>
   </main>
-  <Footer currentPostIndex={currentPostIndex} totalPosts={allPosts.length} />
+  <Footer />
 </Layout>
 
 <script is:inline data-astro-rerun>
   /** Create a progress indicator
    *  at the top */
   function createProgressBar() {
-    // Create the main container div
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
-
-    // Create the progress bar div
+    document.getElementById("myBar")?.remove();
     const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.className = "reading-progress";
     progressBar.id = "myBar";
-
-    // Append the progress bar to the progress container
-    progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
-    document.body.appendChild(progressContainer);
+    document.body.appendChild(progressBar);
   }
   createProgressBar();
 
@@ -202,7 +175,7 @@ const nextPost =
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     const headings = Array.from(
-      document.querySelectorAll("h2, h3, h4, h5, h6")
+      document.querySelectorAll("#article h2, #article h3, #article h4, #article h5, #article h6")
     );
     for (const heading of headings) {
       heading.classList.add("group");
@@ -219,6 +192,33 @@ const nextPost =
     }
   }
   addHeadingLinks();
+
+  /** Contents rail: h2/h3 of the article, active one marked while reading */
+  function buildToc() {
+    const toc = document.getElementById("post-toc");
+    if (!toc) return;
+    const heads = Array.from(document.querySelectorAll("#article h2[id], #article h3[id]"))
+      .filter(h => h.textContent?.trim().replace(/#$/, "") !== "Table of contents");
+    if (!heads.length) { toc.style.visibility = "hidden"; return; }
+    const links = new Map();
+    for (const h of heads) {
+      const a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = (h.textContent ?? "").replace(/#$/, "").trim();
+      if (h.tagName === "H3") a.className = "is-sub";
+      toc.appendChild(a);
+      links.set(h, a);
+    }
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        toc.querySelector(".is-active")?.classList.remove("is-active");
+        links.get(e.target)?.classList.add("is-active");
+      }
+    }, { rootMargin: "0px 0px -70% 0px" });
+    heads.forEach(h => io.observe(h));
+  }
+  buildToc();
 
   /** Attaches copy buttons to code blocks in the document,
    * allowing users to copy code easily. */

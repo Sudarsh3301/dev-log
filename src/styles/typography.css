@@ -1,45 +1,70 @@
 @plugin "@tailwindcss/typography";
 
 @layer base {
-  /* ===== Override default Tailwind Typography styles ===== */
-  /* ===== Code: three tiers of deliberately unequal weight =====
-     1. inline token — a tint inside the sentence, no chip
-     2. source block — raised paper, hairline rule, syntax highlighted
-     3. output block — quietest: no fill, dashed rule, dimmed
-     Prose stays the loudest element on the page. */
-  .app-prose pre {
-    background: transparent;
-    color: var(--code-fg);
-    border: 0;
-    border-left: 2px solid var(--code-border);
-    border-radius: 0;
-    padding: 2px 0 2px 18px;
-    font-size: 12.5px;
-    overflow-x: auto;
-  }
-  .app-prose h2::before { content: "// "; color: var(--accent); }
-
   .app-prose {
+    color: var(--foreground);
+    font-family: var(--font-serif);
+
     p,
     li {
-      font-size: 16px;
-      line-height: 24px;
+      font-size: 20px;
+      line-height: 1.65;
     }
 
     p {
-      margin-bottom: 1rem;
+      margin-block: 0 1.4rem;
+    }
+
+    /* Drop cap on the opening paragraph only. */
+    > p:first-of-type::first-letter {
+      float: left;
+      font-size: 4.4em;
+      line-height: 0.85;
+      padding: 0.08em 0.12em 0 0;
+      color: var(--heading);
+    }
+
+    h2 {
+      margin: 3.5rem 0 0.75rem;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 2.5rem 0 0.5rem;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h4 {
+      margin: 2rem 0 0.5rem;
+      font-size: 20px;
+      font-style: italic;
     }
 
     a {
-      @apply wrap-break-word underline-offset-4 focus-visible:no-underline;
-      color: var(--foreground);
+      @apply wrap-break-word;
+      color: var(--heading);
       text-decoration: none;
-      transition: color 0.2s ease-in-out;
+      box-shadow: inset 0 -1px 0 var(--accent-line);
+      transition: color 0.25s, box-shadow 0.25s;
     }
 
     a:hover {
       color: var(--accent);
-      text-decoration: underline;
+      box-shadow: inset 0 -1px 0 var(--accent);
+    }
+
+    .heading-link {
+      box-shadow: none;
+      color: var(--muted-text);
+      font-family: var(--font-ui);
+      font-size: 0.6em;
+    }
+
+    strong {
+      color: var(--heading);
+      font-weight: 600;
     }
 
     ul {
@@ -47,39 +72,46 @@
     }
 
     li::marker {
-      color: var(--accent);
+      color: var(--muted-text);
     }
 
     hr {
       border-color: var(--border);
+      margin-block: 3rem;
     }
 
     img {
-      @apply mx-auto border border-border;
+      @apply mx-auto;
       max-width: min(100%, 46rem);
       height: auto;
     }
 
-    /* Paired diagrams already sit in a half-width column — opt them out of the
-       contained-width rule above, or they get squeezed a second time. */
     .twd-diagram img {
       max-width: none;
       width: 100%;
     }
 
     figcaption {
-      @apply opacity-75;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      color: var(--muted-text);
     }
 
     table {
+      font-family: var(--font-ui);
+      font-size: 15px;
+
       th,
       td {
-        border: 1px solid var(--border);
-        padding: 0.5rem;
+        border-bottom: 1px solid var(--border);
+        padding: 0.5rem 0.75rem;
       }
 
       th {
         @apply py-1.5;
+        border-bottom-color: var(--rule);
+        color: var(--heading);
+        font-weight: 500;
       }
 
       code {
@@ -89,35 +121,27 @@
 
     code {
       @apply wrap-break-word before:content-none after:content-none;
-      border-radius: 0px;
-      background-color: transparent;
-      padding: 0;
       font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 18px;
+      font-size: 13.5px;
+      line-height: 1.7;
     }
 
-    /* TIER 1 — inline tokens. A faint tint carrying the sentence, not a chip
-       pasted into it: no border, minimal padding, ink-colored text. Scoped
-       with :not(pre) > so fenced blocks are untouched. */
+    /* Inline tokens: a faint tint inside the sentence, not a chip. */
     :not(pre) > code {
       background-color: var(--code-inline-bg);
       color: var(--heading);
-      border: 0;
       border-radius: 3px;
       padding: 0.1em 0.32em;
-      font-size: 0.92em;
-    }
-
-    .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0;
+      font-size: 0.8em;
     }
 
     blockquote {
       @apply wrap-break-word;
-      border-inline-start-color: var(--accent);
-      color: var(--foreground);
-      opacity: 0.84;
+      margin-block: 2rem;
+      padding-left: 1.25rem;
+      border-left: 1px solid var(--rule);
+      font-style: italic;
+      color: var(--soft-text);
     }
 
     details {
@@ -125,63 +149,60 @@
     }
 
     summary {
-      @apply focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent focus-visible:outline-dashed;
+      @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+      font-family: var(--font-ui);
+      font-size: 14px;
     }
 
+    /* Source blocks sit on a midnight-ink panel: dark surface for hierarchy. */
     pre {
-      @apply focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-dashed;
-      border-radius: 0px;
+      @apply focus-visible:outline-2 focus-visible:outline-accent;
+      margin-block: 0 2rem;
+      padding: 1.1rem 1.25rem;
       border: 0;
-      border-left: 2px solid var(--code-border);
-      background-color: transparent;
-      padding: 2px 0 2px 1rem;
+      border-radius: 0;
+      background-color: var(--code-bg);
+      color: var(--code-fg);
+      font-size: 13.5px;
       overflow-x: auto;
     }
   }
 
-  /* Math displays share the dashed-rule language with output blocks, but keep
-     their fill — softened from the near-black --heading to the same hairline
-     used by code, so no block on the page carries a heavy border. */
+  /* Math displays: fine dividers, no box. */
   .katex-display {
-    margin: 24px 0;
-    padding: 18px;
-    background: var(--muted);
-    border: 1px dashed var(--border);
+    margin: 2rem 0;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     text-align: center;
   }
 
-  /* ===== TIER 2 — source blocks =====
-     The token palette must match the block's background, not the page's. Now
-     that --code-bg follows the theme (raised paper in light, raised ink in
-     dark), the theme-matched Shiki palettes are correct: min-light is built
-     for a near-white ground, github-dark for a dark one. */
+  /* Code is always on ink, so always use Shiki's dark palette. */
   .astro-code {
-    @apply flex [&_span]:text-(--shiki-light);
-    border: 0;
-    border-left: 2px solid var(--code-border);
-    background-color: transparent !important;
+    @apply flex [&_span]:text-(--shiki-dark);
+    background-color: var(--code-bg) !important;
     color: var(--code-fg);
   }
 
-  html[data-theme="dark"] .astro-code {
-    @apply [&_span]:text-(--shiki-dark);
-    background-color: transparent !important;
-    color: var(--code-fg);
+  .astro-code code {
+    @apply flex-[1_0_100%] bg-inherit p-0;
   }
 
-  /* ===== TIER 3 — output / result blocks =====
-     Benchmark output is evidence, not source. It gets the lightest treatment
-     on the page: no fill, a dashed rule echoing the KaTeX display convention,
-     and dimmed text — so a result never competes with the kernel above it.
-     Astro emits data-language; the class is kept as a fallback. */
+  .copy-code {
+    font-family: var(--font-ui);
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid var(--ink-border);
+    color: var(--ink-fg);
+  }
+
+  /* Output / result blocks are evidence, not source: quietest treatment,
+     on the page itself with a dashed rule. */
   .app-prose pre.astro-code[data-language="plaintext"],
   .app-prose pre.astro-code[data-language="text"],
   .app-prose pre.astro-code.language-plaintext {
     background-color: transparent !important;
-    border: 0;
-    border-left: 2px dashed var(--border);
-    color: var(--muted-text);
-    padding: 2px 0 2px 18px;
+    border-left: 1px dashed var(--muted-text);
+    padding: 2px 0 2px 1.1rem;
   }
 
   .app-prose pre.astro-code[data-language="plaintext"] span,
@@ -190,8 +211,7 @@
     color: var(--muted-text) !important;
   }
 
-  /* Styles for Shiki transformers */
-  /* https://shiki.style/packages/transformers */
+  /* Shiki transformers: https://shiki.style/packages/transformers */
   .astro-code {
     .line.diff.add {
       @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];

@@ -1,5 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
 import { SITE } from "@/config";
 import IconGitHub from "@/assets/icons/IconGitHub.svg";
 import IconBrandX from "@/assets/icons/IconBrandX.svg";
@@ -7,73 +9,43 @@ import IconLinkedin from "@/assets/icons/IconLinkedin.svg";
 import IconMail from "@/assets/icons/IconMail.svg";
 import IconGraduationCap from "@/assets/icons/IconGraduationCap.svg";
 
-const navItems = [
-  ["blog", "long-form technical writing"],
-  ["notes", "short observations, fragments"],
-  ["lab", "experiments, prototypes, benchmarks"],
-  ["projects", "research and project writeups"],
-  ["papers", "notes, reproductions, reading traces"],
-  ["random", "books, inspirations, misc"],
-];
+const sections = ["Blog", "Notes", "Lab", "Projects", "Papers", "Random"];
+
+const socials = [
+  { href: SITE.github, label: "GitHub", Icon: IconGitHub },
+  { href: SITE.twitter, label: "X", Icon: IconBrandX },
+  { href: SITE.linkedin, label: "LinkedIn", Icon: IconLinkedin },
+  { href: SITE.email, label: "Email", Icon: IconMail },
+  { href: SITE.googleScholar, label: "Google Scholar", Icon: IconGraduationCap },
+].filter(s => s.href);
 ---
 
 <Layout title={SITE.title} description={SITE.desc}>
-  <main id="main-content" data-layout="index" class="home-layout app-layout">
-    <div class="identity">
-      <img src="/profile.png" alt={`${SITE.author}'s photo`} class="profile-pic" />
-      <div class="identity-text">
-        <h1 class="identity-name">{SITE.author}</h1>
-        <div class="identity-icons">
-          {SITE.github && (
-            <a href={SITE.github} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on GitHub`}>
-              <IconGitHub class="meta-icon-svg" />
-            </a>
-          )}
-          {SITE.twitter && (
-            <a href={SITE.twitter} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on X`}>
-              <IconBrandX class="meta-icon-svg" />
-            </a>
-          )}
-          {SITE.linkedin && (
-            <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on LinkedIn`}>
-              <IconLinkedin class="meta-icon-svg" />
-            </a>
-          )}
-          {SITE.email && (
-            <a href={SITE.email} target="_blank" rel="noopener noreferrer" title={`Email ${SITE.author}`}>
-              <IconMail class="meta-icon-svg" />
-            </a>
-          )}
-          {SITE.googleScholar && (
-            <a href={SITE.googleScholar} target="_blank" rel="noopener noreferrer" title={`${SITE.author} on Google Scholar`}>
-              <IconGraduationCap class="meta-icon-svg" />
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
-
-    <p>I work on reasoning systems, inference optimization, and multimodal AI.</p>
-    <p>Currently exploring efficient reasoning architectures, latent-space methods, and real-time AI systems.</p>
-    <p>My <a href="/random/blogs/motives" target="_blank" class="accent-link">world model</a> is simple: build systems that expose how models think, not just what they output.</p>
-
-    <nav class="home-nav" aria-label="Notebook sections">
-      {navItems.map(([label, desc], i) => (
-        <a href={`/${label}`}>
-          <span class="tree-prefix">{i === navItems.length - 1 ? "└─" : "├─"}</span>
-          <span>{`0${i + 1}_${label}/`}</span>
-          <span class="home-nav-desc">{desc}</span>
+  <Header />
+  <main id="main-content" data-layout="index" class="home">
+    <h1 class="home-name">{SITE.author}</h1>
+    <p class="home-bio">
+      I work on reasoning systems, inference optimization, and multimodal AI.
+      My <a href="/random/blogs/motives">world model</a> is simple: build systems
+      that expose how models think, not just what they output.
+    </p>
+    <nav class="home-sections" aria-label="Notebook sections">
+      {sections.map(label => <a href={`/${label.toLowerCase()}`}>{label}</a>)}
+    </nav>
+    <div class="home-icons">
+      {socials.map(({ href, label, Icon }) => (
+        <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`${SITE.author} on ${label}`}>
+          <Icon />
         </a>
       ))}
-    </nav>
+    </div>
   </main>
+  <Footer />
 </Layout>
 
 <script>
   document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset?.layout;
-    if (indexLayout) {
+    if (document.querySelector("#main-content[data-layout='index']")) {
       sessionStorage.setItem("backUrl", "/");
     }
   });

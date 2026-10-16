@@ -4,6 +4,8 @@ import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { SITE } from "@/config";
 import "@/styles/global.css";
 import "katex/dist/katex.min.css";
+import Cursor from "@/components/Cursor.astro";
+import Atmosphere from "@/components/Atmosphere.astro";
 
 type Props = {
   title?: string;
@@ -60,7 +62,7 @@ const structuredData = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Instrument+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
     <!-- General Meta Tags -->
@@ -164,7 +166,9 @@ const structuredData = {
     </script>
   </head>
   <body>
+    <Atmosphere />
     <slot />
+    <Cursor />
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>

@@ -5,7 +5,7 @@ export const SITE = {
   desc: "A quiet research notebook on AI systems, inference optimization, reasoning architectures, and multimodal AI.",
   title: "Übermensch",
   ogImage: "",
-  lightAndDarkMode: true,
+  lightAndDarkMode: false,
   postPerIndex: 5,
   postPerPage: 8,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
