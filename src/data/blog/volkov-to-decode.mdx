@@ -1,0 +1,199 @@
+---
+title: "A 2008 ratio on a 2026 laptop: measuring the decode roofline on an RTX 3050"
+author: Sudarsh
+pubDatetime: 2026-10-20T00:00:00.000Z
+description: "Volkov's flop:word ratio and the scaling book's B_crit are the same number. I measured it, the knee, decode attention and a full Qwen3-1.7B decode step on a 6 GB laptop GPU."
+tags: [gpu, inference, systems, benchmarks]
+draft: true
+---
+
+import TextWithDiagram from "@/components/TextWithDiagram.astro";
+import AttentionBandwidth from "@/components/volkov-to-decode/AttentionBandwidth.astro";
+import BandwidthVsSize from "@/components/volkov-to-decode/BandwidthVsSize.astro";
+import ByteBudget from "@/components/volkov-to-decode/ByteBudget.astro";
+import EagerGraphSchematic from "@/components/volkov-to-decode/EagerGraphSchematic.astro";
+import EagerVsGraph from "@/components/volkov-to-decode/EagerVsGraph.astro";
+import FixedCost from "@/components/volkov-to-decode/FixedCost.astro";
+import GqaLayout from "@/components/volkov-to-decode/GqaLayout.astro";
+import Knee from "@/components/volkov-to-decode/Knee.astro";
+import MatmulTflops from "@/components/volkov-to-decode/MatmulTflops.astro";
+import MatmulToScale from "@/components/volkov-to-decode/MatmulToScale.astro";
+import Roofline from "@/components/volkov-to-decode/Roofline.astro";
+import StepVsBound from "@/components/volkov-to-decode/StepVsBound.astro";
+
+In 2008, Vasily Volkov and James Demmel argued that "modern GPUs should be viewed as multithreaded multicore vector units", and for every kernel that touches memory they asked one question: how many flops does it do per word it moves? The GTX280 did 624 Gflop/s in single precision against 141 GB/s of memory bandwidth. Their Table 1 lists that as 18 flops per 4-byte word. A kernel that does fewer flops per word than the machine is waiting on memory, and BLAS1 and BLAS2 always were: "BLAS1 and BLAS2 operations are bandwidth bound on the GPU as their flop:word ratio is below the flop:word ratio of GPUs."
+
+Seventeen years later, the [scaling book's chapter on transformer inference](https://jax-ml.github.io/scaling-book/inference/) makes the same argument under a different name. It calls the ratio $B_{crit}$, the token batch at which a matmul stops being memory-bound, and puts it at 240 for a TPU v5e and "about 280" for an H100. Batch-1 decode is matrix-vector work: one token's activations times every weight matrix in the model. It is Volkov's BLAS2 regime with a transformer around it.
+
+The two models differ in what they leave out. Volkov's has a fixed cost per call, $\text{Time} = 4\,\mu s + \text{bytes} / 127\,\text{GB/s}$, and he measured how much of the pin bandwidth a plain copy gets (89%). The scaling book's step-time bound has neither. It divides bytes by spec bandwidth.
+
+So I measured both ceilings on the only GPU I own, an RTX 3050 6GB laptop card, and then held the scaling-book formula against a full Qwen3-1.7B decode step on it. The claim of this post: **the flop:word ratio still tells you where decode stops being memory-bound, but it does not tell you how long a decode step takes until you measure the bandwidth yourself and get the launches out of the way.**
+
+| Machine | Compute | Bandwidth | flops per byte | Source |
+|---|---|---|---|---|
+| GTX280, fp32 | 624 Gflop/s | 141 GB/s | 4.4 | Volkov & Demmel, Table 1 |
+| TPU v5e, bf16 | | | 240 | scaling book |
+| H100, bf16 | | | ~280 | scaling book |
+| RTX 3050 6GB Laptop, bf16 | ~17 TFLOP/s (measured) | 133–141 GB/s (measured median) | ~121–128 | this post |
+
+For bf16 weights and bf16 activations, $B_{crit}$ in tokens and the ratio in flops per byte are the same number, which is why one column holds both. The GTX280 row is fp32 on vector units and the other three are tensor-core bf16, so the jump from 4.4 to ~125 on the laptop card is partly a change of unit. It is still the number that sets the knee.
+
+## Table of contents
+
+## Two ceilings, measured
+
+A roofline needs two numbers, and for this card I could not trust either one. Notebookcheck lists the RTX 3050 6GB Laptop at "Memory Bandwidth 144 GB/s". My unit reports a 7001 MHz memory clock on a 96-bit GDDR6 bus, which works out to $7001 \times 2 \times 96 / 8 = 168$ GB/s. I could not find a published bf16 tensor throughput for it at all.
+
+So I measured them the way Volkov did: a stream copy for bandwidth (his §3.5) and a large matmul for compute. Everything below is PyTorch 2.5.1 on Windows, timed with CUDA events, median of 10 to 30 runs after warm-up, with a 4-second busy loop first so the GPU leaves its idle clock state. My first attempt skipped that loop and the small copies ran at a 810 MHz memory clock.
+
+```python
+src = torch.randn(n, device="cuda", dtype=torch.bfloat16)
+dst = torch.empty_like(src)
+med, best = time_ms(lambda: dst.copy_(src))                   # read + write
+med_r, best_r = time_ms(lambda: src.sum(dtype=torch.float32))  # read only
+
+a = torch.randn(n, n, device="cuda", dtype=torch.bfloat16)
+b = torch.randn(n, n, device="cuda", dtype=torch.bfloat16)
+med_mm, best_mm = time_ms(lambda: a @ b, iters=10)            # 2·n³ flops
+```
+
+```plaintext
+copy, 512 MB – 2 GB      median 133–136 GB/s   (read + write counted)
+read-only sum, ≥ 512 MB  median 137–141 GB/s
+read-only sum, 128–256 MB median 148–153 GB/s  best single run 159.8 GB/s (256 MB)
+copy, 1 MB               median  68 GB/s
+bf16 matmul, n ≥ 2048    median 16.0–17.1 TFLOP/s
+bf16 matmul, n = 512     median  5.9 TFLOP/s
+```
+
+<BandwidthVsSize />
+
+From 512 MB up, the medians sit just under 144, which fits either spec. What breaks the tie is the readings above it: read medians of 148–153 GB/s at 128–256 MB, a best read of 159.8 GB/s, and a 157 GB/s median from the attention sweep in section 3. The copy sweep ran once and the attention number did not repeat (the second run topped out at 141), so I hold this loosely. My reading is that 168 is the real pin rate and a simple kernel gets about 80% of it. Volkov's GTX280 got 89% on an aligned copy.
+
+The 1 MB copy at half speed is Volkov's fixed cost in its usual form: a small transfer cannot cover the cost of starting the kernel. Fitting his model to the whole copy sweep gives about 19 µs per call plus 141 GB/s, so a copy has to move about 2.6 MB before it reaches half its peak rate. His GTX280 fit was 4 µs. The two fixed terms are not the same quantity: I time each call alone between two CUDA events, and he timed many asynchronous launches together.
+
+<FixedCost />
+
+Compute is cleaner. Above $n = 2048$ the matmul plateaus at about 17 TFLOP/s. Dividing the two gives this card's ratio: 17.0 TFLOP/s over the 133–141 GB/s medians is 121–128 flops per byte. If the 158 GB/s readings are the real ceiling, it drops to 108. That is the number the next section tries to find with a stopwatch.
+
+<MatmulTflops />
+
+## The knee: $B_{crit}$ measured instead of computed
+
+Take one weight matmul from Qwen3-1.7B, the FFW up-projection: activations $[B, 2048]$ times weights $[2048, 6144]$. The weights are read once no matter how many tokens are in the batch. Only the activations grow with $B$.
+
+$$
+\begin{aligned}
+\text{FLOPs} &= 2BDF \\
+\text{bytes} &= 2DF + 2BD + 2BF \\
+I(B) &= \frac{2BDF}{2DF + 2BD + 2BF} \approx B \quad \text{when } B \ll D, F
+\end{aligned}
+$$
+
+<TextWithDiagram side="right">
+
+So arithmetic intensity is roughly the batch size, and the matmul turns compute-bound when $B$ reaches the machine's ratio. With the full byte count, a ratio of 121–128 puts the crossover at $B \approx 131$–$140$, and a ratio of 108 at $B \approx 116$. Below that, the time should be flat, because the cost is reading 25 MB of weights. Above it, the time should grow linearly with $B$.
+
+<MatmulToScale slot="diagram" />
+
+</TextWithDiagram>
+
+```python
+W = torch.randn(6144, 2048, device="cuda", dtype=torch.bfloat16)
+for B in [1, 2, 4, *range(8, 513, 8), 640, 768, 896, 1024]:
+    x = torch.randn(B, 2048, device="cuda", dtype=torch.bfloat16)
+    med, best = time_ms(lambda: F.linear(x, W), iters=30)
+```
+
+I ran the sweep twice.
+
+```plaintext
+B        run 1 ms   run 2 ms   run 2 TFLOP/s
+1          0.188      0.227       0.11
+64         0.251      0.288       5.6
+120        0.278      0.247      12.2
+128        0.395      0.383       8.4
+136–160    0.57–0.59  0.57–0.62   5.8–6.5
+192        0.394      0.430      11.2
+512        1.523      1.521       8.5
+640        0.938      0.934      17.2
+1024       1.530      1.538      16.8
+```
+
+<Knee />
+
+The flat part ends close to where the ratio says it should. From one token to 120 tokens the matmul takes about the same 0.2–0.3 ms, and at $B = 1$ it pulls the weights at 111–134 GB/s, near the copy ceiling. At $B = 120$ the same call does 12.2 TFLOP/s. You get 120 tokens for the price of one. The time jumps at 128, a little before the 131–140 that the median bandwidth predicts.
+
+What happens after the knee is not what either source drew. The scaling book's TPU appendix says step time "increases very slowly up until around batch 240, and then increases linearly". On this card, $B = 128$ is twice as slow as the roofline allows, and from 128 to 512 the curve is jagged: 192 is faster than 160, and 512 takes as long as 1024. Only at 640 and above does the matmul sit on the 17 TFLOP/s roof. The pattern repeats in both runs within 10%, except one point (B = 200, 28%). The SM clock held at 1972 MHz from 96 to 200 and from 384 to 512, but dipped to 1492–1695 MHz between 208 and 336, so I read nothing into that band. Where the clock is steady, the time still climbs in steps: up at 392, up again at 456. That looks like tile quantization, with cuBLAS picking a different tile shape at each size, but I could not confirm it: the PyTorch profiler on Windows shows only `aten::mm`, not kernel names. That needs Nsight Systems.
+
+<Roofline />
+
+So the ratio predicts the knee to within a few tokens. It says nothing about the 2× penalty band right after it, which is where a server that sizes its batch to the median-bandwidth $B_{crit}$ would land.
+
+## Decode attention never reaches the knee
+
+The weight matmuls get cheaper per token as the batch grows because every request shares the same weights. The KV cache is not shared. Each request reads its own keys and values, so more requests means proportionally more bytes.
+
+Per KV head and per cached position, decode reads one key and one value vector, $2 H_d$ bf16 values or $4 H_d$ bytes. With grouped-query attention, $G$ query heads share that KV head, and each does a dot product with the key and a weighted add of the value, $4 H_d$ flops per query head:
+
+$$
+I_{\text{attn}} = \frac{4 G H_d}{4 H_d} = G
+$$
+
+$B$ does not appear. For Qwen3-1.7B, 16 query heads over 8 KV heads gives $G = 2$: two flops per byte at every batch size, against a ridge of about 125. The scaling book says decode attention is "always memory bandwidth-bound", and this is why. It is the same position as Volkov's saxpy, which he bounded at 21 Gflop/s from bandwidth alone.
+
+<GqaLayout />
+
+If intensity is fixed, the only question left is how much bandwidth the kernel gets. I swept one decode-attention layer, $T = 1$, over context $S$ and batch $B$, with `F.scaled_dot_product_attention`. The flash backend is not compiled into the Windows PyTorch build, so these numbers are the memory-efficient kernel. I ignore $S$ below 1024 at $B = 1$, where the whole cache is close to the 1.5 MB L2.
+
+```plaintext
+KV-read bandwidth, median GB/s, S ≥ 1024       run 1      run 2
+B = 1                                          40–72      48–67
+B = 8                                         113–130    108–119
+B = 32                                        138–157    128–141
+math backend, B = 8 and 32                     15–21   (one outlier: 3 GB/s at B = 32, S = 16384)
+```
+
+<AttentionBandwidth />
+
+The intensity is the same in every row. The bandwidth is not. At $B = 1$ the kernel gets about half of what a copy gets, flat from 4K to 32K tokens. At $B = 32$ it reaches the copy ceiling. One explanation is parallelism: at $B = 1$ one layer has only 8 batch-times-KV-head work units to spread over 20 SMs, and more requests means more units. I have not checked the kernel's launch configuration, so treat that as a guess.
+
+So "bandwidth-bound" is correct, and at batch 1 it means bound by half the bandwidth.
+
+## The whole model on the card
+
+The scaling book's main takeaway is a lower bound on decode step time: if every byte has to come from memory once, a step cannot be faster than
+
+$$
+T_{\min} = \frac{\text{parameter bytes} + B \cdot S \cdot \text{KV bytes per token}}{W_{\text{hbm}}}
+$$
+
+Qwen3-1.7B is 3.44 GB in bf16, which leaves roughly 2 GB of my 6 GB card for KV cache once the driver and other programs take their share. Its output layer is tied to the 622 MB embedding, so that matrix is read on every step too. The KV cache costs 114,688 bytes per token across 28 layers. At $S = 1024$ and $B = 1$, one step reads 3.56 GB, and 97% of that is weights.
+
+<ByteBudget />
+
+My transformers version predates Qwen3, so I wrote a minimal decode step with the exact shapes from the model's `config.json` and random bf16 weights: 28 layers of RMSNorm, QKV projections, QK-norm, attention over the cache, output projection and SwiGLU, then the tied output layer. RoPE is left out because it moves almost no bytes, and sampling is a plain argmax. Timing does not depend on weight values. I ran it eagerly and again captured as one CUDA graph, twice each.
+
+```plaintext
+                      bound (ms) at                 measured median (ms)
+S      B   GB/step   168 GB/s  144 GB/s  136 GB/s   eager run 1/2   graph run 1/2
+1024   1   3.559      21.2      24.7      26.2       50.7 / 59.1     29.1 / 30.2
+1024   2   3.676      21.9      25.5      27.0       46.7 / 51.1     27.4 / 31.6
+1024   4   3.911      23.3      27.2      28.8       41.8 / 58.9     29.9 / 34.0
+1024   8   4.381      26.1      30.4      32.2       45.6 / 51.7     36.4 / 37.9
+512   16   4.381      26.1      30.4      32.2       43.9 / 51.5     36.4 / 39.0
+```
+
+<StepVsBound />
+
+With the graph, the step reads memory at 112–134 GB/s, close to the 133–136 GB/s the copy kernel gets. That is 78–93% of the 144 GB/s spec and 67–80% of the 168 GB/s clock-derived rate. Put my measured copy bandwidth into the formula instead and the bound lands within about 20% of the graph step. The formula is right about what costs time. With a paper bandwidth number it is optimistic by up to a third, and that is the kind of factor Volkov measured (89% on his copy) and the scaling book assumes away.
+
+<EagerVsGraph />
+
+The eager step is the bigger surprise. It reads the same bytes with the same kernels and takes 1.2–2× as long: 36–59% of the 168 GB/s bound, 17–20 tokens per second at batch 1 against 33–34 with the graph. The gap is 7–29 ms per step, and it is not a constant. In the first run it shrank as the batch grew; in the second it did not. That is Volkov's fixed term coming back, but not his 3–7 µs GPU launch. My reading is that the GPU waits on Python and PyTorch dispatching small ops from the CPU. Reading my own step function, it issues roughly 50 ops per layer, about 1,400 per step, so the gap works out to 5–20 µs per op. I have not profiled the CPU side, so the mechanism is unverified. The size of the gap is measured.
+
+<EagerGraphSchematic />
+
+At batch 16 with the graph, the card produces 410–439 tokens per second from one 1.7B model in 6 GB. The weights still cost the same per step, which is the whole case for batching.
+
+Here is where each source leaves me. Volkov's ratio, 18 years old, still predicts where batching stops being free. The scaling book's formula still names the bytes that matter. Neither tells you the step time on a real card until you measure the bandwidth a kernel actually gets and take the launches out of the loop.

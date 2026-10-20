@@ -1,0 +1,16 @@
+---
+---
+<figure class="vf" style="max-width:min(100%,300px)"><svg viewBox="0 0 300 250" role="img" aria-label="Weight matrix drawn to scale against activation strips for 1 and 128 tokens"><rect class="" x="20.0" y="16.0" width="205.8" height="68.6" style="fill:var(--accent);stroke:var(--accent);stroke-width:1;opacity:0.18"/><rect class="" x="20.0" y="16.0" width="205.8" height="68.6" style="fill:none;stroke:var(--accent);stroke-width:1;opacity:1"/><text class="" x="122.9" y="46.3" text-anchor="middle" style="fill:var(--foreground);font-size:11px;font-weight:600">W  2048 × 6144</text><text class="" x="122.9" y="62.3" text-anchor="middle" style="fill:var(--muted-text);font-size:10px;font-weight:400">25.2 MB, read once</text><rect class="" x="20.0" y="112.0" width="68.6" height="1.2" style="fill:var(--foreground);stroke:var(--foreground);stroke-width:0.6;opacity:1"/><text class="" x="96.6" y="116.1" text-anchor="start" style="fill:var(--foreground);font-size:10px;font-weight:400">x, B = 1: 4 KB</text><rect class="" x="20.0" y="140.0" width="68.6" height="4.3" style="fill:var(--foreground);stroke:var(--foreground);stroke-width:0.6;opacity:1"/><text class="" x="96.6" y="145.6" text-anchor="start" style="fill:var(--foreground);font-size:10px;font-weight:400">x, B = 128: 524 KB</text><text class="" x="20.0" y="182.0" text-anchor="start" style="fill:var(--muted-text);font-size:10px;font-weight:400">drawn to scale: area = bytes</text><text class="" x="20.0" y="210.0" text-anchor="start" style="fill:var(--foreground);font-size:10px;font-weight:400">x grows with B; W does not.</text><text class="" x="20.0" y="232.0" text-anchor="start" style="fill:var(--accent);font-size:12px;font-weight:600">flops / bytes ≈ B</text></svg><figcaption class="src">Qwen3-1.7B FFW up-projection shape, bf16</figcaption></figure>
+<style>
+.vf { margin: 1.75rem auto; }
+.vf svg { width: 100%; height: auto; display: block; font-family: var(--font-mono); }
+.vf .src { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted-text); margin-top: 0.35rem; text-align: left; }
+.vf .tog { font-family: var(--font-mono); font-size: 0.75rem; display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+.vf .tog label { border: 1px dashed var(--border); padding: 0.15rem 0.5rem; cursor: pointer; color: var(--muted-text); }
+.vf .tog input { position: absolute; opacity: 0; pointer-events: none; }
+.vf .tog input:checked + span { color: var(--accent); }
+.vf .tog label:has(input:checked) { border-style: solid; border-color: var(--accent); }
+.vf .tog label:has(input:focus-visible) { outline: 2px solid var(--accent); }
+.vf .opt { opacity: 0; transition: opacity 0.2s; }
+.vf:has(input[value=a]:checked) .opt-a, .vf:has(input[value=b]:checked) .opt-b, .vf:has(input[value=c]:checked) .opt-c { opacity: 1; }
+</style>
